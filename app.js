@@ -1,29 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 
-const baseDir = 'C:\\DATA'; // 🔁 Đường dẫn đến thư mục cha
+const baseDir = 'C:\\FTTP'; // 🔁 Đường dẫn gốc
 
-function listSubFolders(dirPath) {
-    if (!fs.existsSync(dirPath)) {
-        console.log(`❌ Thư mục không tồn tại: ${dirPath}`);
-        return;
-    }
+function listAllFolders(dirPath, depth = 0) {
+    if (!fs.existsSync(dirPath)) return;
 
     const items = fs.readdirSync(dirPath, { withFileTypes: true });
 
-    const folders = items
-        .filter(item => item.isDirectory())
-        .map(item => path.join(dirPath, item.name));
-
-    if (folders.length === 0) {
-        console.log('📁 Không có thư mục con nào.');
-    } else {
-        console.log('📁 Các thư mục con hiện có:');
-        folders.forEach(folder => {
-            console.log(' -', folder);
-        });
-    }
+    items.forEach(item => {
+        if (item.isDirectory()) {
+            const folderPath = path.join(dirPath, item.name);
+            const indent = '  '.repeat(depth); // tạo thụt dòng theo cấp
+            console.log(`${indent}- ${folderPath}`);
+            listAllFolders(folderPath, depth + 1); // đệ quy
+        }
+    });
 }
 
-// Gọi hàm
-listSubFolders(baseDir);
+console.log(`📂 Danh sách tất cả thư mục con trong: ${baseDir}`);
+listAllFolders(baseDir);
